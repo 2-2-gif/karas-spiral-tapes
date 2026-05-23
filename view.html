@@ -9,7 +9,7 @@
         h1 { color: #ff69b4; text-shadow: 0 0 10px #ff1493; letter-spacing: 2px; }
         .lang-toggle { margin-bottom: 10px; font-size: 0.8em; color: #aaa; }
         #upload { margin: 20px; padding: 10px; border: 1px solid #ff69b4; cursor: pointer; color: white; background: transparent; }
-        canvas { max-width: 90vw; max-height: 70vh; border: 1px solid #333; box-shadow: 0 0 20px rgba(255, 105, 180, 0.2); cursor: pointer; }
+        canvas { max-width: 90vw; max-height: 70vh; border: 1px solid #333; box-shadow: 0 0 20px rgba(255, 105, 180, 0.2); }
         video { display: none; }
     </style>
 </head>
@@ -20,11 +20,10 @@
             <span onclick="setLang('ar')" style="cursor:pointer;">العربية</span> | 
             <span onclick="setLang('en')" style="cursor:pointer;">English</span>
         </div>
-        <h1 id="title">  Karas Spiral Tapes | أشرطة كاراس الحلزونية</h1>
+        <h1 id="title">أشرطة كاراس الحلزونية</h1>
         <input type="file" id="upload" accept="video/*" />
         <br>
-        <canvas id="canvas" onclick="toggleAudio()"></canvas>
-        <p id="hint" style="color:#666; font-size: 0.9em;">اضغط على الفيديو لتشغيل الصوت | Click to unmute</p>
+        <canvas id="canvas"></canvas>
     </div>
 
     <video id="video" loop playsinline></video>
@@ -40,17 +39,11 @@
                 document.documentElement.lang = 'en';
                 document.documentElement.dir = 'ltr';
                 document.getElementById('title').innerText = 'Karas Spiral Tapes';
-                document.getElementById('hint').innerText = 'Click the video to unmute';
             } else {
                 document.documentElement.lang = 'ar';
                 document.documentElement.dir = 'rtl';
                 document.getElementById('title').innerText = 'أشرطة كاراس الحلزونية';
-                document.getElementById('hint').innerText = 'اضغط على الفيديو لتشغيل الصوت';
             }
-        }
-
-        function toggleAudio() {
-            video.muted = !video.muted;
         }
 
         document.getElementById('upload').onchange = (e) => {
