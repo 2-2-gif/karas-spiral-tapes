@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>أشرطة كاراس الحلزونية | Karas Spiral Tapes</title>
+    <style>
+        body { margin: 0; background: #050505; color: #fff; font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+        .container { text-align: center; z-index: 10; padding: 20px; }
+        h1 { color: #ff69b4; text-shadow: 0 0 10px #ff1493; letter-spacing: 2px; }
+        #upload { margin: 20px; padding: 10px; border: 1px solid #ff69b4; cursor: pointer; }
+        canvas { max-width: 90vw; max-height: 70vh; border: 1px solid #333; box-shadow: 0 0 20px rgba(255, 105, 180, 0.2); }
+        video { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>أشرطة كاراس الحلزونية</h1>
+        <input type="file" id="upload" accept="video/*" />
+        <br>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <video id="video" loop muted playsinline></video>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let offset = 0;
+
+        document.getElementById('upload').onchange = (e) => {
+            const url = URL.createObjectURL(e.target.files[0]);
+            video.src = url;
+            video.play();
+            resize();
+            draw();
+        };
+
+        function resize() {
+            canvas.width = video.videoWidth || window.innerWidth;
+            canvas.height = video.videoHeight || window.innerHeight;
+        }
+
+        function draw() {
+            if (video.paused || video.ended) return;
+
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            let data = imgData.data;
+
+            offset += 0.0005; 
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            for (let y = 0; y < canvas.height; y += 2) { // تسريع المعالجة بـ 2
+                for (let x = 0; x < canvas.width; x += 2) {
+                    const idx = (y * canvas.width + x) * 4;
+                    const dx = x - centerX;
+                    const dy = y - centerY;
+                    const r = Math.sqrt(dx * dx + dy * dy);
+                    const theta = Math.atan2(dy, dx) + offset;
+                    
+                    const targetR = 2 * (theta % (50 * Math.PI));
+                    const diff = Math.abs(r - targetR);
+                    const mistWidth = 25; 
+
+                    if (diff < mistWidth) { 
+                        const density = Math.sin((1 - diff / mistWidth) * Math.PI / 2) * 0.3;
+                        data[idx]     *= (1 + density * (0.5 + 0.5 * Math.sin(offset * 20)));
+                        data[idx + 1] *= (1 - density * 0.5); 
+                        data[idx + 2] *= (1 + density * (0.5 + 0.5 * Math.cos(offset * 20)));
+                    }
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
+            requestAnimationFrame(draw);
+        }
+    </script>
+</body>
+</html>
