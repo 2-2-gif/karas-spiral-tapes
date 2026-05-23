@@ -7,27 +7,51 @@
         body { margin: 0; background: #050505; color: #fff; font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
         .container { text-align: center; z-index: 10; padding: 20px; }
         h1 { color: #ff69b4; text-shadow: 0 0 10px #ff1493; letter-spacing: 2px; }
-        #upload { margin: 20px; padding: 10px; border: 1px solid #ff69b4; cursor: pointer; }
-        canvas { max-width: 90vw; max-height: 70vh; border: 1px solid #333; box-shadow: 0 0 20px rgba(255, 105, 180, 0.2); }
+        .lang-toggle { margin-bottom: 10px; font-size: 0.8em; color: #aaa; }
+        #upload { margin: 20px; padding: 10px; border: 1px solid #ff69b4; cursor: pointer; color: white; background: transparent; }
+        canvas { max-width: 90vw; max-height: 70vh; border: 1px solid #333; box-shadow: 0 0 20px rgba(255, 105, 180, 0.2); cursor: pointer; }
         video { display: none; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>أشرطة كاراس الحلزونية | Karas Spiral Tapes</h1>
+        <div class="lang-toggle">
+            <span onclick="setLang('ar')" style="cursor:pointer;">العربية</span> | 
+            <span onclick="setLang('en')" style="cursor:pointer;">English</span>
+        </div>
+        <h1 id="title">  Karas Spiral Tapes | أشرطة كاراس الحلزونية</h1>
         <input type="file" id="upload" accept="video/*" />
         <br>
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas" onclick="toggleAudio()"></canvas>
+        <p id="hint" style="color:#666; font-size: 0.9em;">اضغط على الفيديو لتشغيل الصوت | Click to unmute</p>
     </div>
 
-    <video id="video" loop muted playsinline></video>
+    <video id="video" loop playsinline></video>
 
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         let offset = 0;
+
+        function setLang(lang) {
+            if(lang === 'en') {
+                document.documentElement.lang = 'en';
+                document.documentElement.dir = 'ltr';
+                document.getElementById('title').innerText = 'Karas Spiral Tapes';
+                document.getElementById('hint').innerText = 'Click the video to unmute';
+            } else {
+                document.documentElement.lang = 'ar';
+                document.documentElement.dir = 'rtl';
+                document.getElementById('title').innerText = 'أشرطة كاراس الحلزونية';
+                document.getElementById('hint').innerText = 'اضغط على الفيديو لتشغيل الصوت';
+            }
+        }
+
+        function toggleAudio() {
+            video.muted = !video.muted;
+        }
 
         document.getElementById('upload').onchange = (e) => {
             const url = URL.createObjectURL(e.target.files[0]);
@@ -53,7 +77,7 @@
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
 
-            for (let y = 0; y < canvas.height; y += 2) { // تسريع المعالجة بـ 2
+            for (let y = 0; y < canvas.height; y += 2) {
                 for (let x = 0; x < canvas.width; x += 2) {
                     const idx = (y * canvas.width + x) * 4;
                     const dx = x - centerX;
